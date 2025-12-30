@@ -1,18 +1,19 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import {
-  ComposableMap,
-  Geographies,
-  Geography,
-  type Geography as GeographyType
-} from "react-simple-maps";
+import { useEffect, useMemo, useState } from "react";
+import type { FeatureCollection, Geometry } from "geojson";
+import { GeoJSON, MapContainer, TileLayer } from "react-leaflet";
+import { feature } from "topojson-client";
 import type { CountryRecord } from "../lib/countryData";
 
 type SortKey = "name" | "population" | "gdp" | "capital" | "currencies";
 
-const WORLD_TOPOJSON =
+const WORLD_TOPOJSON_URL =
   "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
+const SATELLITE_TILE_URL =
+  "https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}";
+const SATELLITE_ATTRIBUTION =
+  "Tiles © Esri — Source: Esri, Maxar, Earthstar Geographics, and the GIS User Community";
 
 const numberFormatter = new Intl.NumberFormat("en-US", {
   notation: "compact",
@@ -31,6 +32,32 @@ export default function CountryDashboard({ countries }: { countries: CountryReco
   const [regionFilter, setRegionFilter] = useState("All");
   const [sortKey, setSortKey] = useState<SortKey>("population");
   const [sortDirection, setSortDirection] = useState<"desc" | "asc">("desc");
+  const [worldGeoJson, setWorldGeoJson] = useState<FeatureCollection<Geometry> | null>(
+    null
+  );
+
+  useEffect(() => {
+    let isMounted = true;
+    fetch(WORLD_TOPOJSON_URL)
+      .then((response) => response.json())
+      .then((topology) => {
+        const topoObject = (topology as { objects: { countries: unknown } }).objects
+          .countries;
+        const geoJson = feature(topology, topoObject) as FeatureCollection<Geometry>;
+        if (isMounted) {
+          setWorldGeoJson(geoJson);
+        }
+      })
+      .catch(() => {
+        if (isMounted) {
+          setWorldGeoJson(null);
+        }
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const regions = useMemo(() => {
     const regionSet = new Set(countries.map((country) => country.region));
@@ -87,31 +114,27 @@ export default function CountryDashboard({ countries }: { countries: CountryReco
           )}
         </div>
         <div className="map-satellite">
-          <ComposableMap projectionConfig={{ scale: 140 }} style={{ width: "100%", height: "auto" }}>
-            <Geographies geography={WORLD_TOPOJSON}>
-              {({ geographies }) =>
-                geographies.map((geo: GeographyType) => {
+          <MapContainer center={[20, 0]} zoom={2} minZoom={1} className="map-container">
+            <TileLayer url={SATELLITE_TILE_URL} attribution={SATELLITE_ATTRIBUTION} />
+            {worldGeoJson ? (
+              <GeoJSON
+                data={worldGeoJson}
+                style={(featureData) => {
                   const isoA3 =
-                    geo.properties?.ISO_A3 ?? geo.properties?.ADM0_A3 ?? geo.properties?.iso_a3;
+                    featureData?.properties?.ISO_A3 ??
+                    featureData?.properties?.ADM0_A3 ??
+                    featureData?.properties?.iso_a3;
                   const isSelected = isoA3 === selectedCca3;
-                  return (
-                    <Geography
-                      key={geo.rsmKey}
-                      geography={geo}
-                      fill={isSelected ? "rgba(56, 189, 248, 0.55)" : "rgba(0, 0, 0, 0.15)"}
-                      stroke="rgba(255, 255, 255, 0.6)"
-                      strokeWidth={0.5}
-                      style={{
-                        default: { outline: "none" },
-                        hover: { fill: "rgba(125, 211, 252, 0.6)", outline: "none" },
-                        pressed: { fill: "rgba(56, 189, 248, 0.7)", outline: "none" }
-                      }}
-                    />
-                  );
-                })
-              }
-            </Geographies>
-          </ComposableMap>
+                  return {
+                    fillColor: isSelected ? "rgba(56, 189, 248, 0.55)" : "rgba(0, 0, 0, 0.2)",
+                    fillOpacity: 1,
+                    color: "rgba(255, 255, 255, 0.6)",
+                    weight: isSelected ? 1.2 : 0.4
+                  };
+                }}
+              />
+            ) : null}
+          </MapContainer>
         </div>
       </section>
 
