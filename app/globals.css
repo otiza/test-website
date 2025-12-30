@@ -1,0 +1,152 @@
+:root {
+  color-scheme: light;
+  font-family: "Inter", system-ui, sans-serif;
+  background-color: #f7f7fb;
+  color: #1f2933;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: #f7f7fb;
+}
+
+.page-shell {
+  padding: 32px 24px 40px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+header {
+  margin-bottom: 24px;
+}
+
+h1 {
+  font-size: 2rem;
+  margin-bottom: 8px;
+}
+
+.subtitle {
+  color: #52606d;
+  margin-top: 0;
+}
+
+.dashboard {
+  display: grid;
+  gap: 24px;
+}
+
+.map-panel,
+.table-panel {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 12px 24px rgba(15, 23, 42, 0.08);
+}
+
+.map-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.map-satellite {
+  background-image: url("https://upload.wikimedia.org/wikipedia/commons/9/97/The_Earth_seen_from_Apollo_17.jpg");
+  background-size: cover;
+  background-position: center;
+  border-radius: 16px;
+  padding: 12px;
+  overflow: hidden;
+}
+
+.map-caption {
+  color: #52606d;
+  font-size: 0.95rem;
+}
+
+.table-controls {
+  display: grid;
+  grid-template-columns: minmax(200px, 1fr) 200px 160px;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.table-controls input,
+.table-controls select {
+  border: 1px solid #d9e2ec;
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 0.95rem;
+}
+
+.table-scroll {
+  max-height: 360px;
+  overflow: auto;
+  border: 1px solid #e4e7eb;
+  border-radius: 12px;
+}
+
+.table-scroll table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 720px;
+}
+
+th,
+td {
+  padding: 12px 14px;
+  border-bottom: 1px solid #e4e7eb;
+  text-align: left;
+  font-size: 0.92rem;
+}
+
+th button {
+  background: none;
+  border: none;
+  padding: 0;
+  font-weight: 600;
+  color: #1f2933;
+  cursor: pointer;
+}
+
+tr.selected {
+  background: #e0f2fe;
+}
+
+.table-scroll tbody tr {
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.table-scroll tbody tr:hover {
+  background: #f0f4f8;
+}
+
+.badge {
+  background: #f5f7fa;
+  padding: 4px 8px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+}
+
+.empty-state {
+  padding: 24px;
+  text-align: center;
+  color: #52606d;
+}
+
+@media (max-width: 900px) {
+  .table-controls {
+    grid-template-columns: 1fr;
+  }
+
+  .map-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+}
