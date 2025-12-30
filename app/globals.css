@@ -54,6 +54,15 @@ h1 {
   margin-bottom: 16px;
 }
 
+.map-satellite {
+  background-image: url("https://upload.wikimedia.org/wikipedia/commons/9/97/The_Earth_seen_from_Apollo_17.jpg");
+  background-size: cover;
+  background-position: center;
+  border-radius: 16px;
+  padding: 12px;
+  overflow: hidden;
+}
+
 .map-caption {
   color: #52606d;
   font-size: 0.95rem;

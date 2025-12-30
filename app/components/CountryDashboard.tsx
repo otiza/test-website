@@ -86,29 +86,33 @@ export default function CountryDashboard({ countries }: { countries: CountryReco
             <span className="badge">Select a country below</span>
           )}
         </div>
-        <ComposableMap projectionConfig={{ scale: 140 }} style={{ width: "100%", height: "auto" }}>
-          <Geographies geography={WORLD_TOPOJSON}>
-            {({ geographies }) =>
-              geographies.map((geo: GeographyType) => {
-                const isSelected = geo.properties?.ISO_A3 === selectedCca3;
-                return (
-                  <Geography
-                    key={geo.rsmKey}
-                    geography={geo}
-                    fill={isSelected ? "#38bdf8" : "#d9e2ec"}
-                    stroke="#ffffff"
-                    strokeWidth={0.6}
-                    style={{
-                      default: { outline: "none" },
-                      hover: { fill: "#7dd3fc", outline: "none" },
-                      pressed: { fill: "#38bdf8", outline: "none" }
-                    }}
-                  />
-                );
-              })
-            }
-          </Geographies>
-        </ComposableMap>
+        <div className="map-satellite">
+          <ComposableMap projectionConfig={{ scale: 140 }} style={{ width: "100%", height: "auto" }}>
+            <Geographies geography={WORLD_TOPOJSON}>
+              {({ geographies }) =>
+                geographies.map((geo: GeographyType) => {
+                  const isoA3 =
+                    geo.properties?.ISO_A3 ?? geo.properties?.ADM0_A3 ?? geo.properties?.iso_a3;
+                  const isSelected = isoA3 === selectedCca3;
+                  return (
+                    <Geography
+                      key={geo.rsmKey}
+                      geography={geo}
+                      fill={isSelected ? "rgba(56, 189, 248, 0.55)" : "rgba(0, 0, 0, 0.15)"}
+                      stroke="rgba(255, 255, 255, 0.6)"
+                      strokeWidth={0.5}
+                      style={{
+                        default: { outline: "none" },
+                        hover: { fill: "rgba(125, 211, 252, 0.6)", outline: "none" },
+                        pressed: { fill: "rgba(56, 189, 248, 0.7)", outline: "none" }
+                      }}
+                    />
+                  );
+                })
+              }
+            </Geographies>
+          </ComposableMap>
+        </div>
       </section>
 
       <section className="table-panel">
